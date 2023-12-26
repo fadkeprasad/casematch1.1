@@ -16,7 +16,6 @@ const UserProfile: React.FC = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const navigate = useNavigate();
   const auth = getAuth();
-  const user = auth.currentUser;
   const db = getDatabase();
   const [name, setName] = useState('');
   const [caseLog, setCaseLog] = useState('');
@@ -52,6 +51,7 @@ const UserProfile: React.FC = () => {
 
 
   const saveUserData = () => {
+    const user = auth.currentUser;
     if (user) {
       const db = getDatabase();
       const userId = user.uid;
@@ -81,6 +81,7 @@ const UserProfile: React.FC = () => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        setIsUserAuthenticated(true);
         const userProfileRef = ref(db, 'userProfiles/' + user.uid);
         onValue(userProfileRef, (snapshot) => {
           const data = snapshot.val();
@@ -98,6 +99,7 @@ const UserProfile: React.FC = () => {
           }
         });
       } else {
+        setIsUserAuthenticated(false);
         navigate('/signin');
       }
     }); // This is the correct place for the closing parenthesis
@@ -125,6 +127,7 @@ const UserProfile: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    const user = auth.currentUser;
     if (user) {
       const userProfileRef = ref(db, 'userProfiles/' + user.uid);
       set(userProfileRef, {
