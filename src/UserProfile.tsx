@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment-timezone'; // make sure to have installed moment-timezone
 import { getDatabase, ref, set, onValue } from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useAuth } from './AuthContext';
 
 
 const strengthsOptions = ['Framework', 'Public Math', 'Brainstorming', 'Clearing Chart', 'Time Utilization', 'Clarifying Questions', 'Speaking Speed'];
@@ -14,6 +15,7 @@ const difficultyLevels = ['Easy', 'Medium', 'Difficult'];
 
 const UserProfile: React.FC = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const auth = getAuth();
   const db = getDatabase();
@@ -28,11 +30,10 @@ const UserProfile: React.FC = () => {
 
   const saveProfile = async () => {
     const auth = getAuth();
-    const user = auth.currentUser;
 
-    if (user) {
+    if (currentUser) {
       // Proceed with saving the profile data
-      const userProfileRef = ref(db, 'userProfiles/' + user.uid);
+      const userProfileRef = ref(db, 'userProfiles/' + currentUser.uid);
       try {
         await set(userProfileRef, {
           // Your profile data here
@@ -51,10 +52,10 @@ const UserProfile: React.FC = () => {
 
 
   const saveUserData = () => {
-    const user = auth.currentUser;
-    if (user) {
+    
+    if (currentUser) {
       const db = getDatabase();
-      const userId = user.uid;
+      const userId = currentUser.uid;
       const userPreferencesRef = ref(db, 'users/' + userId);
 
       set(userPreferencesRef, {
@@ -127,9 +128,8 @@ const UserProfile: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const user = auth.currentUser;
-    if (user) {
-      const userProfileRef = ref(db, 'userProfiles/' + user.uid);
+    if (currentUser) {
+      const userProfileRef = ref(db, 'userProfiles/' + currentUser.uid);
       set(userProfileRef, {
         name,
         caseLog,
