@@ -6,10 +6,12 @@ import SignIn from './SignIn';
 import HomePage from './HomePage';
 import UserProfile from './UserProfile';
 import PrivateRoute from './PrivateRoute';
+import { AuthProvider } from './AuthContext';
 // ... any other imports
 
 const App: React.FC = () => {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -26,6 +28,7 @@ const App: React.FC = () => {
         {/* ... other routes */}
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 
