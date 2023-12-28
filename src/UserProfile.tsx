@@ -162,9 +162,7 @@ const UserProfile: React.FC = () => {
   return (
 
     <div style={{ margin: '20px' }}>
-      <h1>User Profile</h1>
-      <p>Is user authenticated: {isUserAuthenticated ? 'Yes' : 'No'}</p>
-      {/* The rest of your component */}
+
       <h1>User Profile</h1>
       <form onSubmit={handleSubmit}>
         <div style={formFieldStyle}>
