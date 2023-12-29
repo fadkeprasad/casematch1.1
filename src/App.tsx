@@ -7,6 +7,7 @@ import HomePage from './HomePage';
 import UserProfile from './UserProfile';
 import PrivateRoute from './PrivateRoute';
 import { AuthProvider } from './AuthContext';
+import DataViewer from './DataViewer';
 // ... any other imports
 
 const App: React.FC = () => {
@@ -25,6 +26,15 @@ const App: React.FC = () => {
             </PrivateRoute>
           }
         />
+        <Route
+            path="/dataviewer"
+            element={
+              <PrivateRoute>
+                <DataViewer />
+              </PrivateRoute>
+            }
+        />
+
         {/* ... other routes */}
       </Routes>
     </Router>

@@ -6,6 +6,7 @@ import moment from 'moment-timezone'; // make sure to have installed moment-time
 import { getDatabase, ref, set, onValue } from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useAuth } from './AuthContext';
+import { Link } from 'react-router-dom';
 
 
 const strengthsOptions = ['Framework', 'Public Math', 'Brainstorming', 'Clearing Chart', 'Time Utilization', 'Clarifying Questions', 'Speaking Speed'];
@@ -19,7 +20,7 @@ const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const auth = getAuth();
   const db = getDatabase();
-  const [name, setName] = useState('');
+  const [email, setemail] = useState('');
   const [caseLog, setCaseLog] = useState('');
   const [numberOfCases, setNumberOfCases] = useState('');
   const [timezone, setTimezone] = useState('');
@@ -59,7 +60,7 @@ const UserProfile: React.FC = () => {
       const userPreferencesRef = ref(db, 'users/' + userId);
 
       set(userPreferencesRef, {
-        name: name,
+        Email: email,
         caseLog: caseLog,
         numberOfCases: numberOfCases,
         timezone: timezone,
@@ -87,7 +88,7 @@ const UserProfile: React.FC = () => {
         onValue(userProfileRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            setName(data.name || '');
+            setemail(data.email || '');
             setCaseLog(data.caseLog || '');
             setNumberOfCases(data.numberOfCases || '');
             setTimezone(data.timezone || '');
@@ -131,7 +132,7 @@ const UserProfile: React.FC = () => {
     if (currentUser) {
       const userProfileRef = ref(db, 'userProfiles/' + currentUser.uid);
       set(userProfileRef, {
-        name,
+        email,
         caseLog,
         numberOfCases,
         timezone,
@@ -167,8 +168,8 @@ const UserProfile: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <div style={formFieldStyle}>
           <label style={labelStyle}>
-            Name:
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={50} />
+            Email:
+            <input type="text" value={email} onChange={(e) => setemail(e.target.value)} maxLength={50} />
           </label>
         </div>
 
@@ -272,7 +273,15 @@ const UserProfile: React.FC = () => {
 
         <button type="submit">Save Profile</button>
       </form>
+
+      <div style={{ margin: '20px' }}>
+      {/* ... existing form and other elements */}
+      
+      <Link to="/dataviewer">View Database</Link> {/* Add this line */}
+      </div>
+
     </div>
+    
     
 
     
