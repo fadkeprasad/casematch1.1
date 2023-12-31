@@ -14,6 +14,7 @@ const weaknessesOptions = [...strengthsOptions]; // Assuming the same options fo
 const caseTypes = ['Profitability', 'Market Entry', 'Pricing', 'Acquisition', 'Operations', 'Human Resources', 'Non-traditional'];
 const difficultyLevels = ['Easy', 'Medium', 'Difficult'];
 
+
 const UserProfile: React.FC = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const { currentUser } = useAuth();
@@ -58,16 +59,21 @@ const UserProfile: React.FC = () => {
       const db = getDatabase();
       const userId = currentUser.uid;
       const userPreferencesRef = ref(db, 'users/' + userId);
+      const processedStrengths = strengths.length > 0 ? strengths : null;
+      const processedWeaknesses = weaknesses.length > 0 ? weaknesses : null;
+      const processedPreferredCaseTypes = preferredCaseTypes.length > 0 ? preferredCaseTypes : null;
+      const processedNumberOfCases = numberOfCases || null;
+      const processedPreferredDifficulty = preferredDifficulty || null;
 
       set(userPreferencesRef, {
-        Email: email,
-        caseLog: caseLog,
-        numberOfCases: numberOfCases,
-        timezone: timezone,
-        strengths: strengths,
-        weaknesses: weaknesses,
-        preferredCaseTypes: preferredCaseTypes,
-        preferredDifficulty: preferredDifficulty
+        Email: email || null,
+        caseLog: caseLog || null,
+        numberOfCases: processedNumberOfCases,
+        timezone: timezone || null,
+        strengths: processedStrengths,
+        weaknesses: processedWeaknesses,
+        preferredCaseTypes: processedPreferredCaseTypes,
+        preferredDifficulty: processedPreferredDifficulty
       }).then(() => {
         // Data saved successfully
         console.log('User preferences saved.');

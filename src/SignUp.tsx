@@ -1,7 +1,7 @@
 // src/SignUp.tsx
 
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth } from './firebase';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,8 +23,9 @@ const SignUp: React.FC = () => {
     }
     
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      setMessage('You are registered! Sign-in now!');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(userCredential.user);
+      setMessage('Registration successful! A verification email has been sent. Please verify your email.');
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         setMessage('You are already registered, please sign-in.');

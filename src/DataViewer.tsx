@@ -55,6 +55,19 @@ const DataViewer: React.FC = () => {
     );
   };
 
+
+    // ... states and other functions ...
+  
+    // Function to handle rendering of strengths and weaknesses
+    const renderArrayOrEmpty = (array: string[] | null) => {
+      // If array is null or not an array, return an empty string
+      if (!array || !Array.isArray(array)) {
+        return '';
+      }
+      // Otherwise, join the array elements with a comma
+      return array.join(', ');
+    };
+
   useEffect(() => {
     const db = getDatabase();
     const usersRef = ref(db, 'userProfiles/');
@@ -130,9 +143,9 @@ const DataViewer: React.FC = () => {
             <tr key={index}>
         <td>{user.email}</td>
         <td>{user.numberOfCases}</td>
-        <td>{user.strengths.join(', ')}</td> {/* Assuming strengths is an array */}
-        <td>{user.weaknesses.join(', ')}</td> {/* Assuming weaknesses is an array */}
-        <td>{user.preferredCaseTypes.join(', ')}</td> {/* Assuming preferredCaseTypes is an array */}
+        <td>{renderArrayOrEmpty(user.strengths)}</td> {/* Assuming strengths is an array */}
+        <td>{renderArrayOrEmpty(user.weaknesses)}</td> {/* Assuming weaknesses is an array */}
+        <td>{renderArrayOrEmpty(user.preferredCaseTypes)}</td> {/* Assuming preferredCaseTypes is an array */}
         <td>{user.timezone}</td>
         <td>{user.preferredDifficulty}</td>
             </tr>
