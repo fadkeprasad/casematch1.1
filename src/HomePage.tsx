@@ -1,7 +1,7 @@
 // src/HomePage.tsx
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();

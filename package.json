@@ -10,11 +10,13 @@
     "@types/node": "^16.18.68",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
-    "@types/react-router-dom": "^5.3.3",
+    "binary-extensions": "^2.2.0",
+    "eslint": "^8.56.0",
     "firebase": "^10.7.1",
     "moment-timezone": "^0.5.43",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router": "^6.21.1",
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
@@ -24,7 +26,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint ."
   },
   "eslintConfig": {
     "extends": [
@@ -43,5 +46,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3"
   }
 }

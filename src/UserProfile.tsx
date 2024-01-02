@@ -119,11 +119,7 @@ const UserProfile: React.FC = () => {
 
   // Load existing profile data from your backend here...
 
-  const labelStyle = {
-    fontWeight: 'bold',
-    color: 'blue',
-    marginRight: '10px', // Optional, adds some space between the label and the input
-  };
+
 
   const handleCheckboxChange = (option: string, selectedOptions: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => {
     if (selectedOptions.includes(option)) {
@@ -158,38 +154,90 @@ const UserProfile: React.FC = () => {
   };
 
   
+  const formFieldStyle = {
+    marginBottom: '15px', // Slightly reduced bottom margin
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    alignItems: 'start',
+    width: '100%' // Ensures fields use the full width of the container
+  };
+
+  const labelStyle = {
+    fontWeight: 'bold',
+    color: 'darkblue',
+    marginBottom: '10px'
+  };
+
+  const inputStyle = {
+    padding: '8px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    width: '100%',
+    marginBottom: '15px'
+  };
+
+  const buttonStyle = {
+    backgroundColor: 'darkblue',
+    color: 'white',
+    padding: '10px 15px',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer'
+  };
+
+  const containerStyle = {
+    maxWidth: '800px', // Increased maxWidth for more space
+    margin: '20px auto', // Centered with automatic horizontal margins
+    padding: '20px',
+    backgroundColor: '#f0f2f5',
+    borderRadius: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+  };
+  
 
   useEffect(() => {
     // Set the default timezone
     setTimezone(moment.tz.guess());
   }, []);
 
-  const formFieldStyle = { marginBottom: '20px' };
 
   return (
-
-    <div style={{ margin: '20px' }}>
-
-      <h1>User Profile</h1>
+    <div style={containerStyle}>
+      <h1 style={{ color: 'darkblue', textAlign: 'center' }}>User Profile</h1>
       <form onSubmit={handleSubmit}>
         <div style={formFieldStyle}>
           <label style={labelStyle}>
             Email:
-            <input type="text" value={email} onChange={(e) => setemail(e.target.value)} maxLength={50} />
+            <input 
+              type="text" 
+              value={email} 
+              onChange={(e) => setemail(e.target.value)} 
+              maxLength={50} 
+              style={inputStyle} 
+            />
           </label>
         </div>
-
+  
         <div style={formFieldStyle}>
           <label style={labelStyle}>
             Case Log URL:
-            <input type="url" value={caseLog} onChange={(e) => setCaseLog(e.target.value)} />
+            <input 
+              type="url" 
+              value={caseLog} 
+              onChange={(e) => setCaseLog(e.target.value)} 
+              style={inputStyle} 
+            />
           </label>
         </div>
-
+  
         <div style={formFieldStyle}>
           <label style={labelStyle}>
             Number of Cases:
-            <select value={numberOfCases} onChange={(e) => setNumberOfCases(e.target.value)}>
+            <select 
+              value={numberOfCases} 
+              onChange={(e) => setNumberOfCases(e.target.value)}
+              style={inputStyle}
+            >
               <option value="<10">Fewer than 10</option>
               <option value="11-20">11-20</option>
               <option value="21-30">21-30</option>
@@ -199,26 +247,28 @@ const UserProfile: React.FC = () => {
             </select>
           </label>
         </div>
-
+  
         <div style={formFieldStyle}>
           <label style={labelStyle}>
             Timezone:
-            <select value={timezone} onChange={(e) => setTimezone(e.target.value)}>
+            <select 
+              value={timezone} 
+              onChange={(e) => setTimezone(e.target.value)}
+              style={inputStyle}
+            >
               {moment.tz.names().map((tz) => (
-                <option key={tz} value={tz}>
-                  {tz}
-                </option>
+                <option key={tz} value={tz}>{tz}</option>
               ))}
             </select>
           </label>
         </div>
-
+  
         <div style={formFieldStyle}>
           <label style={labelStyle}>
-          Strengths:
+            Strengths:
           </label>
           {strengthsOptions.map((option) => (
-            <label key={option}>
+            <div key={option} style={{ marginBottom: '5px' }}>
               <input
                 type="checkbox"
                 value={option}
@@ -226,16 +276,16 @@ const UserProfile: React.FC = () => {
                 onChange={(e) => handleCheckboxChange(option, strengths, setStrengths)}
               />
               {option}
-            </label>
+            </div>
           ))}
         </div>
-
+  
         <div style={formFieldStyle}>
           <label style={labelStyle}>
-          Weaknesses:
+            Weaknesses:
           </label>
           {weaknessesOptions.map((option) => (
-            <label key={option}>
+            <div key={option} style={{ marginBottom: '5px' }}>
               <input
                 type="checkbox"
                 value={option}
@@ -243,16 +293,16 @@ const UserProfile: React.FC = () => {
                 onChange={(e) => handleCheckboxChange(option, weaknesses, setWeaknesses)}
               />
               {option}
-            </label>
+            </div>
           ))}
         </div>
-
+  
         <div style={formFieldStyle}>
           <label style={labelStyle}>
-          Preferred Type of Cases:
+            Preferred Type of Cases:
           </label>
           {caseTypes.map((option) => (
-            <label key={option}>
+            <div key={option} style={{ marginBottom: '5px' }}>
               <input
                 type="checkbox"
                 value={option}
@@ -260,38 +310,34 @@ const UserProfile: React.FC = () => {
                 onChange={(e) => handleCheckboxChange(option, preferredCaseTypes, setPreferredCaseTypes)}
               />
               {option}
-            </label>
+            </div>
           ))}
         </div>
-
+  
         <div style={formFieldStyle}>
           <label style={labelStyle}>
             Preferred Difficulty Level:
-            <select value={preferredDifficulty} onChange={(e) => setPreferredDifficulty(e.target.value)}>
+            <select 
+              value={preferredDifficulty} 
+              onChange={(e) => setPreferredDifficulty(e.target.value)}
+              style={inputStyle}
+            >
               {difficultyLevels.map((level) => (
-                <option key={level} value={level}>
-                  {level}
-                </option>
+                <option key={level} value={level}>{level}</option>
               ))}
             </select>
           </label>
         </div>
-
-        <button type="submit">Save Profile</button>
+  
+        <button style={buttonStyle} type="submit">Save Profile</button>
       </form>
-
-      <div style={{ margin: '20px' }}>
-      {/* ... existing form and other elements */}
-      
-      <Link to="/dataviewer">View Database</Link> {/* Add this line */}
+  
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <Link to="/dataviewer" style={{ color: 'darkblue' }}>View Database</Link>
       </div>
-
     </div>
-    
-    
-
-    
   );
-};
+              }
+  
 
 export default UserProfile;

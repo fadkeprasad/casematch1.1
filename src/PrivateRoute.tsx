@@ -1,7 +1,8 @@
 // src/PrivateRoute.tsx
 
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { useAuth } from './AuthContext';
 
