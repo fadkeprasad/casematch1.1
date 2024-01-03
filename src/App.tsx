@@ -8,12 +8,12 @@ import UserProfile from './UserProfile';
 import PrivateRoute from './PrivateRoute';
 import { AuthProvider } from './AuthContext';
 import DataViewer from './DataViewer';
-// ... any other imports
+// ... any other imports <Router basename="https://fadkeprasad.github.io/casematch1.1/">
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
-    <Router>
+    <Router basename="/casematch1.1">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignUp />} />
