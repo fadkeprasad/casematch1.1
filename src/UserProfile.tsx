@@ -3,16 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment-timezone'; // make sure to have installed moment-timezone
-import { getDatabase, ref, set, onValue } from 'firebase/database';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useAuth } from './AuthContext';
 import { Link } from 'react-router-dom';
+import { getDatabase, ref, set, onValue, push, remove } from 'firebase/database';
 
 
 const strengthsOptions = ['Framework', 'Public Math', 'Brainstorming', 'Clearing Chart', 'Time Utilization', 'Clarifying Questions', 'Speaking Speed'];
 const weaknessesOptions = [...strengthsOptions]; // Assuming the same options for weaknesses
 const caseTypes = ['Profitability', 'Market Entry', 'Pricing', 'Acquisition', 'Operations', 'Human Resources', 'Non-traditional'];
 const difficultyLevels = ['Easy', 'Medium', 'Difficult'];
+
 
 
 const UserProfile: React.FC = () => {
@@ -29,6 +30,20 @@ const UserProfile: React.FC = () => {
   const [weaknesses, setWeaknesses] = useState<string[]>([]);
   const [preferredCaseTypes, setPreferredCaseTypes] = useState<string[]>([]);
   const [preferredDifficulty, setPreferredDifficulty] = useState('');
+
+  interface CaseDetail {
+  Case_Name: string;
+  caseBook: string;
+  caseTypeFirm: string;
+  industry: string;
+  casePartner: string;
+  performance: string;
+  isOther: boolean;
+}
+
+
+  const [caseDetails, setCaseDetails] = useState<CaseDetail[]>([]);
+  
 
   const saveProfile = async () => {
     const auth = getAuth();
@@ -116,8 +131,66 @@ const UserProfile: React.FC = () => {
     return () => unsubscribe();
   }, [navigate, db]); // Removed `user` from the dependency array
   
+  useEffect(() => {
 
-  // Load existing profile data from your backend here...
+  const db = getDatabase();
+  const caseDetailsRef = ref(db, 'casematch-c55af');
+  onValue(caseDetailsRef, (snapshot) => {
+    const data = snapshot.val();
+    console.log(data);
+    if (data) {
+      // If data is an object with keys, convert to array
+      const caseDetailsArray = Object.values(data as { [key: string]: CaseDetail });
+      setCaseDetails(caseDetailsArray);
+    }
+  });
+ }, []);
+
+ // Define the interface for a case log entry
+interface CaseLogEntry {
+  Case_Name: string;
+  caseBook: string;
+  caseTypeFirm: string;
+  industry: string;
+  casePartner: string;
+  performance: string;
+  isOther: boolean;
+}
+
+// ...inside your component
+const [caseLogs, setCaseLogs] = useState<CaseLogEntry[]>([]); // Use the interface here
+
+
+ const handleAddCase = () => {
+  const newCaseLog = {
+    Case_Name: '',
+    caseBook: '',
+    caseTypeFirm: '',
+    industry: '',
+    casePartner: '',
+    performance: '',
+    isOther: false, // Track if the 'Other' option is selected
+  };
+  setCaseLogs([...caseLogs, newCaseLog]);
+};
+
+type CaseLogKey = keyof CaseLogEntry;
+
+const updateCaseLog = (index: number, field: CaseLogKey, value: string) => {
+  setCaseLogs((prevCaseLogs) => {
+    const newCaseLogs = [...prevCaseLogs];
+    // Here we assert that field is a key of CaseLogEntry
+    const updatedCaseLog = { ...newCaseLogs[index], [field]: value };
+    newCaseLogs[index] = updatedCaseLog;
+    return newCaseLogs;
+  });
+};
+
+ const handleDeleteCaseLog = (index: number) => {
+  const newCaseLogs = [...caseLogs];
+  newCaseLogs.splice(index, 1);
+  setCaseLogs(newCaseLogs);
+};
 
 
 
@@ -330,14 +403,75 @@ const UserProfile: React.FC = () => {
         </div>
   
         <button style={buttonStyle} type="submit">Save Profile</button>
+
+            <div style={formFieldStyle}>
+            <h2 style={{ color: 'darkblue', marginBottom: '20px' }}>Case Logs:</h2>
+      
+      {caseLogs.map((caseLog, index) => (
+        <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          {/* Include a dropdown for each case attribute */}
+          {/* For simplicity, I'm just showing one dropdown for Case_Name */}
+          <div style={{ marginRight: '10px' }}>
+            <label>Case Name:</label>
+            <select
+              value={caseLog.Case_Name}
+              onChange={(e) => updateCaseLog(index, 'Case_Name', e.target.value)}
+              style={inputStyle}
+            >
+              {/* Assuming caseDetails is an array of objects with a Case_Name property */}
+              {caseDetails.map((detail, detailIndex) => (
+                <option key={`Case_Name-${detailIndex}`} value={detail.Case_Name}>{detail.Case_Name}</option>
+              ))}
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div style={{ marginRight: '10px' }}>
+            <label>Case Book:</label>
+            <select
+              value={caseLog.caseBook}
+              onChange={(e) => updateCaseLog(index, 'caseBook', e.target.value)}
+              style={inputStyle}
+            >
+              {caseDetails.map((detail, detailIndex) => (
+                <option key={`caseBook-${detailIndex}`} value={detail.caseBook}>{detail.caseBook}</option>
+              ))}
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          {/* Repeat for caseBook, caseTypeFirm, industry, casePartner, and performance */}
+          
+          {/* Remove Case Button */}
+          <button onClick={() => handleDeleteCaseLog(index)} style={buttonStyle}>
+            Remove Case
+          </button>
+        </div>
+      ))}
+
+      {/* Add Case Button */}
+      <button type="button" onClick={handleAddCase} style={buttonStyle}>
+        Add Case
+      </button>
+      </div>
+
+
+
       </form>
   
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
         <Link to="/dataviewer" style={{ color: 'darkblue' }}>View Database</Link>
       </div>
     </div>
-  );
-              }
+
+
+
+   
+
+  
+  
+  
+  
+  );           
+  }
   
 
 export default UserProfile;
