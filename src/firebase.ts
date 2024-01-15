@@ -20,7 +20,13 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+const firstDatabaseURL = 'https://casematch-c55af-default-rtdb.firebaseio.com/';
+const userdb = getDatabase(app, firstDatabaseURL);
+const secondDatabaseURL = 'https://casematch-c55af.firebaseio.com/';
+const caselogdb = getDatabase(app, secondDatabaseURL);
+
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
-const database = getDatabase(app);
-export { auth, database };
+
+export { auth, userdb, caselogdb };

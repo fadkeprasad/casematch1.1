@@ -6,7 +6,8 @@ import moment from 'moment-timezone'; // make sure to have installed moment-time
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useAuth } from './AuthContext';
 import { Link } from 'react-router-dom';
-import { getDatabase, ref, set, onValue, push, remove } from 'firebase/database';
+import { ref, set, onValue, push, remove } from 'firebase/database';
+import { userdb, caselogdb } from './firebase';
 
 
 const strengthsOptions = ['Framework', 'Public Math', 'Brainstorming', 'Clearing Chart', 'Time Utilization', 'Clarifying Questions', 'Speaking Speed'];
@@ -21,7 +22,7 @@ const UserProfile: React.FC = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const auth = getAuth();
-  const db = getDatabase();
+  const db = userdb;
   const [email, setemail] = useState('');
   const [caseLog, setCaseLog] = useState('');
   const [numberOfCases, setNumberOfCases] = useState('');
@@ -33,9 +34,9 @@ const UserProfile: React.FC = () => {
 
   interface CaseDetail {
   Case_Name: string;
-  caseBook: string;
+  Case_Book: string;
   caseTypeFirm: string;
-  industry: string;
+  Industry: string;
   casePartner: string;
   performance: string;
   isOther: boolean;
@@ -71,7 +72,7 @@ const UserProfile: React.FC = () => {
   const saveUserData = () => {
     
     if (currentUser) {
-      const db = getDatabase();
+      const db = userdb;
       const userId = currentUser.uid;
       const userPreferencesRef = ref(db, 'users/' + userId);
       const processedStrengths = strengths.length > 0 ? strengths : null;
@@ -133,8 +134,8 @@ const UserProfile: React.FC = () => {
   
   useEffect(() => {
 
-  const db = getDatabase();
-  const caseDetailsRef = ref(db, 'casematch-c55af');
+  const db = caselogdb;
+  const caseDetailsRef = ref(db, '/');
   onValue(caseDetailsRef, (snapshot) => {
     const data = snapshot.val();
     console.log(data);
@@ -149,9 +150,9 @@ const UserProfile: React.FC = () => {
  // Define the interface for a case log entry
 interface CaseLogEntry {
   Case_Name: string;
-  caseBook: string;
+  Case_Book: string;
   caseTypeFirm: string;
-  industry: string;
+  Industry: string;
   casePartner: string;
   performance: string;
   isOther: boolean;
@@ -160,13 +161,14 @@ interface CaseLogEntry {
 // ...inside your component
 const [caseLogs, setCaseLogs] = useState<CaseLogEntry[]>([]); // Use the interface here
 
-
- const handleAddCase = () => {
+ 
+ const handleAddCase = (event: any) => {
+  event.preventDefault();
   const newCaseLog = {
     Case_Name: '',
-    caseBook: '',
+    Case_Book: '',
     caseTypeFirm: '',
-    industry: '',
+    Industry: '',
     casePartner: '',
     performance: '',
     isOther: false, // Track if the 'Other' option is selected
@@ -184,6 +186,19 @@ const updateCaseLog = (index: number, field: CaseLogKey, value: string) => {
     newCaseLogs[index] = updatedCaseLog;
     return newCaseLogs;
   });
+};
+
+const updateCaseDetails = (index: number, selectedCaseName: string) => {
+  // Find the details of the selected case
+  const selectedCaseDetails = caseDetails.find(detail => detail.Case_Name === selectedCaseName);
+  
+  // If found, update the corresponding case log
+  if (selectedCaseDetails) {
+    updateCaseLog(index, 'Case_Name', selectedCaseName);
+    updateCaseLog(index, 'Case_Book', selectedCaseDetails.Case_Book);
+    updateCaseLog(index, 'Industry', selectedCaseDetails.Industry);
+    updateCaseLog(index, 'caseTypeFirm', selectedCaseDetails.caseTypeFirm);
+  }
 };
 
  const handleDeleteCaseLog = (index: number) => {
@@ -266,6 +281,8 @@ const updateCaseLog = (index: number, field: CaseLogKey, value: string) => {
     borderRadius: '10px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
   };
+
+  
   
 
   useEffect(() => {
@@ -401,72 +418,76 @@ const updateCaseLog = (index: number, field: CaseLogKey, value: string) => {
             </select>
           </label>
         </div>
-  
-        <button style={buttonStyle} type="submit">Save Profile</button>
 
-            <div style={formFieldStyle}>
-            <h2 style={{ color: 'darkblue', marginBottom: '20px' }}>Case Logs:</h2>
-      
-      {caseLogs.map((caseLog, index) => (
-        <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          {/* Include a dropdown for each case attribute */}
-          {/* For simplicity, I'm just showing one dropdown for Case_Name */}
-          <div style={{ marginRight: '10px' }}>
-            <label>Case Name:</label>
-            <select
-              value={caseLog.Case_Name}
-              onChange={(e) => updateCaseLog(index, 'Case_Name', e.target.value)}
-              style={inputStyle}
-            >
-              {/* Assuming caseDetails is an array of objects with a Case_Name property */}
-              {caseDetails.map((detail, detailIndex) => (
-                <option key={`Case_Name-${detailIndex}`} value={detail.Case_Name}>{detail.Case_Name}</option>
-              ))}
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div style={{ marginRight: '10px' }}>
-            <label>Case Book:</label>
-            <select
-              value={caseLog.caseBook}
-              onChange={(e) => updateCaseLog(index, 'caseBook', e.target.value)}
-              style={inputStyle}
-            >
-              {caseDetails.map((detail, detailIndex) => (
-                <option key={`caseBook-${detailIndex}`} value={detail.caseBook}>{detail.caseBook}</option>
-              ))}
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          {/* Repeat for caseBook, caseTypeFirm, industry, casePartner, and performance */}
-          
-          {/* Remove Case Button */}
-          <button onClick={() => handleDeleteCaseLog(index)} style={buttonStyle}>
-            Remove Case
-          </button>
-        </div>
-      ))}
+        <div style={{ marginBottom: '20px' }}>
+  <h2 style={{ color: 'darkblue' }}>Case Logs:</h2>
 
-      {/* Add Case Button */}
-      <button type="button" onClick={handleAddCase} style={buttonStyle}>
-        Add Case
-      </button>
+  {/* Headers */}
+  <div style={{ display: 'flex', marginBottom: '10px', textAlign: 'left' }}>
+    <span style={{ width: '20%', paddingRight: '10px' }}>Case Name</span>
+    <span style={{ width: '20%', paddingRight: '10px' }}>Case Book</span>
+    <span style={{ width: '20%', paddingRight: '10px' }}>Industry</span>
+    <span style={{ width: '20%', paddingRight: '10px' }}>Type</span>
+    <span style={{ width: '20%' }}>Actions</span>
+  </div>
+
+  {caseLogs.map((caseLog, index) => (
+    <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+      {/* Case Name Dropdown */}
+      <div style={{ width: '20%', paddingRight: '10px' }}>
+        <select
+          value={caseLog.Case_Name}
+          onChange={(e) => updateCaseDetails(index, e.target.value)}
+          style={{ width: '100%' }}
+        >
+          {/* Make sure caseDetails is populated correctly */}
+          {caseDetails.map((detail, detailIndex) => (
+            <option key={detailIndex} value={detail.Case_Name}>
+              {detail.Case_Name}
+            </option>
+          ))}
+        </select>
       </div>
 
+      {/* Case Book */}
+      <div style={{ width: '20%', paddingRight: '10px' }}>
+        <input type="text" value={caseLog.Case_Book || ''} readOnly style={{ width: '100%' }} />
+      </div>
+
+      {/* Industry */}
+      <div style={{ width: '20%', paddingRight: '10px' }}>
+        <input type="text" value={caseLog.Industry || ''} readOnly style={{ width: '100%' }} />
+      </div>
+
+      {/* Type */}
+      <div style={{ width: '20%', paddingRight: '10px' }}>
+        <input type="text" value={caseLog.caseTypeFirm || ''} readOnly style={{ width: '100%' }} />
+      </div>
+
+      {/* Remove Case Button */}
+      <div style={{ width: '20%' }}>
+        <button onClick={() => handleDeleteCaseLog(index)}>
+          Remove Case
+        </button>
+      </div>
+    </div>
+  ))}
+
+  <button type="button" onClick={handleAddCase} style={buttonStyle}>
+     Add Case
+  </button>
 
 
-      </form>
-  
+  <button onClick={saveProfile}>
+    Save Profile
+  </button>
+</div>
+</form>
+
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
         <Link to="/dataviewer" style={{ color: 'darkblue' }}>View Database</Link>
       </div>
     </div>
-
-
-
-   
-
-  
   
   
   
