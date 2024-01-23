@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/casematch1.1/static/css/main.e7363f11.css",
+    "main.js": "/casematch1.1/static/js/main.88725907.js",
+    "static/js/787.8f2ff22c.chunk.js": "/casematch1.1/static/js/787.8f2ff22c.chunk.js",
+    "index.html": "/casematch1.1/index.html",
+    "main.e7363f11.css.map": "/casematch1.1/static/css/main.e7363f11.css.map",
+    "main.88725907.js.map": "/casematch1.1/static/js/main.88725907.js.map",
+    "787.8f2ff22c.chunk.js.map": "/casematch1.1/static/js/787.8f2ff22c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e7363f11.css",
+    "static/js/main.88725907.js"
+  ]
+}
