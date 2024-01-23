@@ -17,6 +17,7 @@ const difficultyLevels = ['Easy', 'Medium', 'Difficult'];
 
 
 
+
 const UserProfile: React.FC = () => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const { currentUser } = useAuth();
@@ -24,18 +25,18 @@ const UserProfile: React.FC = () => {
   const auth = getAuth();
   const db = userdb;
   const [email, setemail] = useState('');
-  const [caseLog, setCaseLog] = useState('');
   const [numberOfCases, setNumberOfCases] = useState('');
   const [timezone, setTimezone] = useState('');
   const [strengths, setStrengths] = useState<string[]>([]);
   const [weaknesses, setWeaknesses] = useState<string[]>([]);
   const [preferredCaseTypes, setPreferredCaseTypes] = useState<string[]>([]);
   const [preferredDifficulty, setPreferredDifficulty] = useState('');
+  const [casePartners, setCasePartners] = useState(['Other']);
 
   interface CaseDetail {
   Case_Name: string;
   Case_Book: string;
-  caseTypeFirm: string;
+  Firm_Led_by: string;
   Industry: string;
   casePartner: string;
   performance: string;
@@ -81,15 +82,27 @@ const UserProfile: React.FC = () => {
       const processedNumberOfCases = numberOfCases || null;
       const processedPreferredDifficulty = preferredDifficulty || null;
 
+      const processedCaseLogs = caseLogs.map(log => ({
+        Case_Name: log.Case_Name,
+        Case_Book: log.Case_Book,
+        Firm_Led_by: log.Firm_Led_by,
+        Industry: log.Industry,
+        casePartner: log.casePartner,
+        performance: log.performance,
+        isOther: log.isOther,
+      }));
+
+      console.log('Case logs to save:', processedCaseLogs);
+
       set(userPreferencesRef, {
         Email: email || null,
-        caseLog: caseLog || null,
         numberOfCases: processedNumberOfCases,
         timezone: timezone || null,
         strengths: processedStrengths,
         weaknesses: processedWeaknesses,
         preferredCaseTypes: processedPreferredCaseTypes,
-        preferredDifficulty: processedPreferredDifficulty
+        preferredDifficulty: processedPreferredDifficulty,
+        caseLogs: processedCaseLogs.length > 0 ? processedCaseLogs : null
       }).then(() => {
         // Data saved successfully
         console.log('User preferences saved.');
@@ -109,15 +122,18 @@ const UserProfile: React.FC = () => {
         const userProfileRef = ref(db, 'userProfiles/' + user.uid);
         onValue(userProfileRef, (snapshot) => {
           const data = snapshot.val();
+          const profiles = snapshot.val();
+          const emails = Object.values(profiles).map((profile: any) => profile.email);
+          setCasePartners([...emails, 'Other']);
           if (data) {
             setemail(data.email || '');
-            setCaseLog(data.caseLog || '');
             setNumberOfCases(data.numberOfCases || '');
             setTimezone(data.timezone || '');
             setStrengths(data.strengths || []);
             setWeaknesses(data.weaknesses || []);
             setPreferredCaseTypes(data.preferredCaseTypes || []);
             setPreferredDifficulty(data.preferredDifficulty || '');
+            setCaseLogs(data.caseLogs || []);
           } else {
             setTimezone(moment.tz.guess()); // Setting the timezone if user profile is not found
           }
@@ -151,11 +167,13 @@ const UserProfile: React.FC = () => {
 interface CaseLogEntry {
   Case_Name: string;
   Case_Book: string;
-  caseTypeFirm: string;
+  Firm_Led_by: string;
   Industry: string;
   casePartner: string;
   performance: string;
   isOther: boolean;
+  Case_Partner: string;
+  Performance: string;
 }
 
 // ...inside your component
@@ -167,11 +185,13 @@ const [caseLogs, setCaseLogs] = useState<CaseLogEntry[]>([]); // Use the interfa
   const newCaseLog = {
     Case_Name: '',
     Case_Book: '',
-    caseTypeFirm: '',
+    Firm_Led_by: '',
     Industry: '',
     casePartner: '',
     performance: '',
     isOther: false, // Track if the 'Other' option is selected
+    Case_Partner: '',
+    Performance: ''
   };
   setCaseLogs([...caseLogs, newCaseLog]);
 };
@@ -197,7 +217,7 @@ const updateCaseDetails = (index: number, selectedCaseName: string) => {
     updateCaseLog(index, 'Case_Name', selectedCaseName);
     updateCaseLog(index, 'Case_Book', selectedCaseDetails.Case_Book);
     updateCaseLog(index, 'Industry', selectedCaseDetails.Industry);
-    updateCaseLog(index, 'caseTypeFirm', selectedCaseDetails.caseTypeFirm);
+    updateCaseLog(index, 'Firm_Led_by', selectedCaseDetails.Firm_Led_by);
   }
 };
 
@@ -223,13 +243,13 @@ const updateCaseDetails = (index: number, selectedCaseName: string) => {
       const userProfileRef = ref(db, 'userProfiles/' + currentUser.uid);
       set(userProfileRef, {
         email,
-        caseLog,
         numberOfCases,
         timezone,
         strengths,
         weaknesses,
         preferredCaseTypes,
         preferredDifficulty,
+        caseLogs
       }).then(() => {
         // Data saved successfully!
         alert('Profile saved!');
@@ -303,18 +323,6 @@ const updateCaseDetails = (index: number, selectedCaseName: string) => {
               value={email} 
               onChange={(e) => setemail(e.target.value)} 
               maxLength={50} 
-              style={inputStyle} 
-            />
-          </label>
-        </div>
-  
-        <div style={formFieldStyle}>
-          <label style={labelStyle}>
-            Case Log URL:
-            <input 
-              type="url" 
-              value={caseLog} 
-              onChange={(e) => setCaseLog(e.target.value)} 
               style={inputStyle} 
             />
           </label>
@@ -423,12 +431,14 @@ const updateCaseDetails = (index: number, selectedCaseName: string) => {
   <h2 style={{ color: 'darkblue' }}>Case Logs:</h2>
 
   {/* Headers */}
-  <div style={{ display: 'flex', marginBottom: '10px', textAlign: 'left' }}>
-    <span style={{ width: '20%', paddingRight: '10px' }}>Case Name</span>
-    <span style={{ width: '20%', paddingRight: '10px' }}>Case Book</span>
-    <span style={{ width: '20%', paddingRight: '10px' }}>Industry</span>
-    <span style={{ width: '20%', paddingRight: '10px' }}>Type</span>
-    <span style={{ width: '20%' }}>Actions</span>
+  <div style={{ display: 'flex', marginBottom: '10px', textAlign: 'center' }}>
+    <span style={{ width: '15%', paddingRight: '10px' }}>Case Name</span>
+    <span style={{ width: '15%', paddingRight: '10px' }}>Case Book</span>
+    <span style={{ width: '10%', paddingRight: '10px' }}>Industry</span>
+    <span style={{ width: '10%', paddingRight: '10px' }}>Type</span>
+    <span style={{ width: '15%', paddingRight: '10px' }}>Case Partner</span>
+    <span style={{ width: '15%', paddingRight: '10px' }}>Performance</span>
+    <span style={{ width: '10%' }}>Actions</span>
   </div>
 
   {caseLogs.map((caseLog, index) => (
@@ -461,8 +471,20 @@ const updateCaseDetails = (index: number, selectedCaseName: string) => {
 
       {/* Type */}
       <div style={{ width: '20%', paddingRight: '10px' }}>
-        <input type="text" value={caseLog.caseTypeFirm || ''} readOnly style={{ width: '100%' }} />
+        <input type="text" value={caseLog.Firm_Led_by || ''} readOnly style={{ width: '70%' }} />
       </div>
+
+      <select value={caseLog.Case_Partner} onChange={(e) => updateCaseLog(index, 'Case_Partner', e.target.value)}>
+        {casePartners.map((email) => (
+        <option key={email} value={email}>{email}</option>
+        ))}
+      </select>
+
+      <select value={caseLog.Performance} onChange={(e) => updateCaseLog(index, 'Performance', e.target.value)}>
+         {Array.from({ length: 10 }, (_, i) => i + 1).map((number) => (
+         <option key={number} value={number.toString()}>{number}</option>
+         ))}
+      </select>
 
       {/* Remove Case Button */}
       <div style={{ width: '20%' }}>

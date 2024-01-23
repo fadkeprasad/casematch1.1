@@ -35,7 +35,7 @@ const App: React.FC = () => {
             }
         />
 
-        {/* ... other routes */}
+        {/* ... other Routes */}
       </Routes>
     </Router>
     </AuthProvider>
