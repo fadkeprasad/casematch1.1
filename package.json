@@ -30,7 +30,7 @@
     "eject": "react-scripts eject",
     "lint": "eslint .",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "newbranch -d build"
   },
   "eslintConfig": {
     "extends": [
